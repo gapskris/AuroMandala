@@ -1,0 +1,6 @@
+{
+  "name": "PranaMandala: Sacred Geometry & Mindful Breath",
+  "description": "An interactive mandala art and sacred geometry learning game that synchronizes rhythmic breathing, haptic pulses, and harmonic color patterns for mindful transformation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
