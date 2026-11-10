@@ -168,26 +168,96 @@ export const MandalaCanvas = forwardRef<MandalaCanvasHandle, MandalaCanvasProps>
       const seeded: CachedStrokeRecord[] = [];
       const layerCount = Math.min(3, targetStage.guideRings.length);
 
+      // Dedicated geometric path builder for Folk themes vs Standard Sacred Geometry
       for (let layer = 0; layer < layerCount; layer++) {
         const ringR = targetStage.guideRings[layer] ?? 0.24 * (layer + 1);
         const pts: Point2D[] = [];
-        const steps = 20;
-        const arc = (Math.PI * 1.35) / targetStage.symmetryFold;
-        for (let a = 0; a <= steps; a++) {
-          const t = a / steps;
-          const theta = t * arc + layer * 0.08;
-          const petalMod =
-            0.78 + 0.28 * Math.sin(t * Math.PI * (layer % 2 === 0 ? 1 : 2));
-          const r = ringR * petalMod;
-          pts.push({ x: Math.cos(theta) * r, y: Math.sin(theta) * r });
+        const steps = 24;
+        const fold = targetStage.symmetryFold;
+        const petalArc = (Math.PI * 1.5) / fold;
+
+        if (targetStage.archetype === 'folk-rosette') {
+          // 8-Petal Central Rosette with inner seed bulb and pointed floral tip
+          for (let a = 0; a <= steps; a++) {
+            const t = a / steps;
+            const theta = t * petalArc;
+            // Pointed lotus petal formula
+            const petalProfile = Math.sin(t * Math.PI);
+            const r = ringR * (0.8 + 0.35 * Math.pow(petalProfile, 0.75));
+            pts.push({ x: Math.cos(theta) * r, y: Math.sin(theta) * r });
+          }
+        } else if (targetStage.archetype === 'folk-tulip') {
+          // Tulip Goblet Urn arches with central dip
+          for (let a = 0; a <= steps; a++) {
+            const t = a / steps;
+            const theta = t * petalArc;
+            const arch = Math.sin(t * Math.PI);
+            const cupDip = 0.15 * Math.sin(t * Math.PI * 2);
+            const r = ringR * (0.75 + 0.38 * arch + cupDip);
+            pts.push({ x: Math.cos(theta) * r, y: Math.sin(theta) * r });
+          }
+        } else if (targetStage.archetype === 'folk-paisley') {
+          // Flowing Paisley leaf swirl curling inward at tip
+          for (let a = 0; a <= steps; a++) {
+            const t = a / steps;
+            const theta = t * petalArc + Math.sin(t * Math.PI) * 0.12;
+            const curl = Math.sin(t * Math.PI) * 0.32;
+            const r = ringR * (0.72 + curl);
+            pts.push({ x: Math.cos(theta) * r, y: Math.sin(theta) * r });
+          }
+        } else if (targetStage.archetype === 'folk-daisy') {
+          // Multi-lobed Marigold Daisy floret
+          for (let a = 0; a <= steps; a++) {
+            const t = a / steps;
+            const theta = t * petalArc;
+            const floret = Math.abs(Math.sin(t * Math.PI * 3)) * 0.18;
+            const r = ringR * (0.85 + floret);
+            pts.push({ x: Math.cos(theta) * r, y: Math.sin(theta) * r });
+          }
+        } else if (targetStage.archetype === 'folk-masterpiece') {
+          // Grand composite layer: alternating rosette, tulip, and daisy
+          for (let a = 0; a <= steps; a++) {
+            const t = a / steps;
+            const theta = t * petalArc;
+            const wave =
+              layer === 0
+                ? Math.sin(t * Math.PI) * 0.28
+                : layer === 1
+                ? Math.sin(t * Math.PI * 2) * 0.18 + Math.sin(t * Math.PI) * 0.22
+                : Math.abs(Math.sin(t * Math.PI * 3)) * 0.2;
+            const r = ringR * (0.82 + wave);
+            pts.push({ x: Math.cos(theta) * r, y: Math.sin(theta) * r });
+          }
+        } else {
+          // Standard Sacred Geometry sinusoidal petal arc
+          for (let a = 0; a <= steps; a++) {
+            const t = a / steps;
+            const theta = t * petalArc + layer * 0.08;
+            const petalMod =
+              0.78 + 0.28 * Math.sin(t * Math.PI * (layer % 2 === 0 ? 1 : 2));
+            const r = ringR * petalMod;
+            pts.push({ x: Math.cos(theta) * r, y: Math.sin(theta) * r });
+          }
         }
+
+        const isFolk = targetStage.archetype.startsWith('folk');
         seeded.push({
           points: pts,
           color: targetPalette.colors[layer % targetPalette.colors.length],
           paletteColors: targetPalette.colors,
           glowColor: targetPalette.glowColor,
-          baseWidth: 3.2 - layer * 0.3,
-          brushStyle: layer === 0 ? 'ribbon3d' : layer === 1 ? 'nebula-aurora' : 'lotus-pearl',
+          baseWidth: isFolk ? 3.4 - layer * 0.3 : 3.2 - layer * 0.3,
+          brushStyle: isFolk
+            ? layer === 0
+              ? 'folk-petal'
+              : layer === 1
+              ? 'paisley-swirl'
+              : 'ribbon3d'
+            : layer === 0
+            ? 'ribbon3d'
+            : layer === 1
+            ? 'nebula-aurora'
+            : 'lotus-pearl',
           symmetryFold: targetStage.symmetryFold,
           mirror: targetStage.mirrorSymmetry,
           zLayer: layer + 1,
@@ -270,18 +340,74 @@ export const MandalaCanvas = forwardRef<MandalaCanvasHandle, MandalaCanvasProps>
         const ringIdx = strokeIdx % curStage.guideRings.length;
         const baseR = curStage.guideRings[ringIdx];
         const pts: Point2D[] = [];
-        const steps = 22;
-        const petalArc = (Math.PI * 1.4) / curStage.symmetryFold;
+        const steps = 26;
+        const petalArc = (Math.PI * 1.5) / curStage.symmetryFold;
 
-        for (let i = 0; i <= steps; i++) {
-          const t = i / steps;
-          const theta = t * petalArc;
-          const wave = Math.sin(t * Math.PI * (strokeIdx % 2 === 0 ? 1 : 2)) * 0.088;
-          const r = baseR + wave;
-          pts.push({
-            x: Math.cos(theta) * r,
-            y: Math.sin(theta) * r,
-          });
+        if (curStage.archetype === 'folk-rosette') {
+          // Central Rosette: pointed petal arch with central vein dip
+          for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const theta = t * petalArc;
+            const profile = Math.sin(t * Math.PI);
+            const r = baseR * (0.82 + 0.36 * Math.pow(profile, 0.75));
+            pts.push({ x: Math.cos(theta) * r, y: Math.sin(theta) * r });
+          }
+        } else if (curStage.archetype === 'folk-tulip') {
+          // Tulip Goblet Arches with urn curve
+          for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const theta = t * petalArc;
+            const urn = Math.sin(t * Math.PI) * 0.38 + Math.sin(t * Math.PI * 2) * 0.12;
+            const r = baseR * (0.78 + urn);
+            pts.push({ x: Math.cos(theta) * r, y: Math.sin(theta) * r });
+          }
+        } else if (curStage.archetype === 'folk-paisley') {
+          // Flowing Paisley swirl
+          for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const theta = t * petalArc + Math.sin(t * Math.PI) * 0.15;
+            const curl = Math.sin(t * Math.PI) * 0.35;
+            const r = baseR * (0.75 + curl);
+            pts.push({ x: Math.cos(theta) * r, y: Math.sin(theta) * r });
+          }
+        } else if (curStage.archetype === 'folk-daisy') {
+          // Marigold Daisy floret scalloped wave
+          for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const theta = t * petalArc;
+            const scalloped = Math.abs(Math.sin(t * Math.PI * 3)) * 0.22;
+            const r = baseR * (0.84 + scalloped);
+            pts.push({ x: Math.cos(theta) * r, y: Math.sin(theta) * r });
+          }
+        } else if (curStage.archetype === 'folk-masterpiece') {
+          // Masterpiece multi-tier wave
+          for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const theta = t * petalArc;
+            const mode = strokeIdx % 4;
+            const wave =
+              mode === 0
+                ? Math.sin(t * Math.PI) * 0.32
+                : mode === 1
+                ? Math.sin(t * Math.PI) * 0.36 + Math.sin(t * Math.PI * 2) * 0.12
+                : mode === 2
+                ? Math.sin(t * Math.PI) * 0.34
+                : Math.abs(Math.sin(t * Math.PI * 3)) * 0.22;
+            const r = baseR * (0.8 + wave);
+            pts.push({ x: Math.cos(theta) * r, y: Math.sin(theta) * r });
+          }
+        } else {
+          // Standard sinusoidal arc
+          for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const theta = t * petalArc;
+            const wave = Math.sin(t * Math.PI * (strokeIdx % 2 === 0 ? 1 : 2)) * 0.088;
+            const r = baseR + wave;
+            pts.push({
+              x: Math.cos(theta) * r,
+              y: Math.sin(theta) * r,
+            });
+          }
         }
 
         const breathSnap = latestBreathSnapshotRef.current;
@@ -861,12 +987,54 @@ export const MandalaCanvas = forwardRef<MandalaCanvasHandle, MandalaCanvasProps>
                   : breathPulseWidth;
               drawBranchPath(mirrorSign, 0, 0);
 
-              // Pass D: 3D Specular Ridge / Pearl / Crystalline Facet Detail
+              // Pass D: 3D Specular Ridge / Pearl / Crystalline Facet / Folk Petal Detail
               if (bStyle === 'ribbon3d' || bStyle === 'calligraphy-gold') {
                 ctx.strokeStyle = darkTheme ? '#FFFBEB' : '#FFFFFF';
                 ctx.lineWidth = Math.max(0.8, breathPulseWidth * 0.34);
                 ctx.globalAlpha = 0.72;
                 drawBranchPath(mirrorSign, -1.2, -1.5);
+              } else if (bStyle === 'folk-petal') {
+                // Folk Petal: Draw teardrop accent dots and fine central vein line
+                ctx.strokeStyle = darkTheme ? '#FFF7ED' : '#FDF2D6';
+                ctx.lineWidth = Math.max(0.7, breathPulseWidth * 0.3);
+                ctx.globalAlpha = 0.85;
+                drawBranchPath(mirrorSign, -0.8, -0.8);
+
+                // Accent bulb at the tip of the petal
+                if (pts.length > 0) {
+                  const tipPt = pts[pts.length - 1];
+                  const px = tipPt.x * layerR;
+                  const py = tipPt.y * mirrorSign * layerR;
+                  const rx = layerCx + px * cosR - py * sinR;
+                  const ry = layerCy + px * sinR + py * cosR;
+                  ctx.fillStyle = '#F4B341'; // Saffron gold finial dot
+                  ctx.beginPath();
+                  ctx.arc(rx, ry, breathPulseWidth * 0.9, 0, Math.PI * 2);
+                  ctx.fill();
+                  ctx.fillStyle = '#FFFFFF';
+                  ctx.beginPath();
+                  ctx.arc(rx - 1, ry - 1, breathPulseWidth * 0.35, 0, Math.PI * 2);
+                  ctx.fill();
+                }
+              } else if (bStyle === 'paisley-swirl') {
+                // Paisley Swirl: Dual golden rim with inner dot series
+                ctx.strokeStyle = '#F4B341';
+                ctx.lineWidth = Math.max(0.8, breathPulseWidth * 0.36);
+                ctx.globalAlpha = 0.9;
+                drawBranchPath(mirrorSign, 1.2, 1.2);
+
+                const midIdx = Math.floor(pts.length / 2);
+                if (pts[midIdx]) {
+                  const midPt = pts[midIdx];
+                  const px = midPt.x * layerR;
+                  const py = midPt.y * mirrorSign * layerR;
+                  const rx = layerCx + px * cosR - py * sinR;
+                  const ry = layerCy + px * sinR + py * cosR;
+                  ctx.fillStyle = '#D35933';
+                  ctx.beginPath();
+                  ctx.arc(rx, ry, breathPulseWidth * 0.85, 0, Math.PI * 2);
+                  ctx.fill();
+                }
               } else if (bStyle === 'lotus-pearl' || bStyle === 'crystalline') {
                 const stride = Math.max(3, Math.floor(pts.length / 4));
                 for (let p = 0; p < pts.length; p += stride) {

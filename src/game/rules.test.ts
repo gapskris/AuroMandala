@@ -15,10 +15,10 @@ import {
   project3DLayerTransform,
 } from './rules';
 
-test('SACRED_STAGES and COLOR_PALETTES contain 10 progressive levels and 6 brush styles', () => {
-  assert.equal(SACRED_STAGES.length, 10);
-  assert.equal(COLOR_PALETTES.length, 10);
-  assert.equal(BRUSH_STYLES.length, 6);
+test('SACRED_STAGES and COLOR_PALETTES contain 15 progressive levels, 11 palettes, and 8 brush styles', () => {
+  assert.equal(SACRED_STAGES.length, 15);
+  assert.equal(COLOR_PALETTES.length, 11);
+  assert.equal(BRUSH_STYLES.length, 8);
 
   // Verify progressive symmetry folds and difficulty multipliers
   assert.equal(SACRED_STAGES[0].symmetryFold, 6);
@@ -26,6 +26,21 @@ test('SACRED_STAGES and COLOR_PALETTES contain 10 progressive levels and 6 brush
   assert.ok(
     SACRED_STAGES[9].difficultyMultiplier > SACRED_STAGES[0].difficultyMultiplier
   );
+
+  // Verify Folk stages (11 to 15)
+  const folkRosette = SACRED_STAGES.find((s) => s.id === 11);
+  assert.ok(folkRosette);
+  assert.equal(folkRosette.symmetryFold, 8);
+  assert.equal(folkRosette.archetype, 'folk-rosette');
+
+  const folkMasterpiece = SACRED_STAGES.find((s) => s.id === 15);
+  assert.ok(folkMasterpiece);
+  assert.equal(folkMasterpiece.symmetryFold, 8);
+  assert.equal(folkMasterpiece.archetype, 'folk-masterpiece');
+
+  const terracottaPalette = COLOR_PALETTES.find((p) => p.id === 'folk-terracotta-jewel');
+  assert.ok(terracottaPalette);
+  assert.equal(terracottaPalette.colors.length, 6);
 });
 
 test('computeBreathState transitions accurately across 4-4-4-4 Sama Vritti Box Breath phases', () => {

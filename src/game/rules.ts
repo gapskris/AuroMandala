@@ -13,7 +13,9 @@ export type BrushStyleId =
   | 'crystalline'
   | 'lotus-pearl'
   | 'nebula-aurora'
-  | 'calligraphy-gold';
+  | 'calligraphy-gold'
+  | 'folk-petal'
+  | 'paisley-swirl';
 
 export interface BrushStyleSpec {
   id: BrushStyleId;
@@ -33,7 +35,12 @@ export type GeometryArchetype =
   | 'torus3d'
   | 'dodecahedron3d'
   | 'kalachakra'
-  | 'sahasrara3d';
+  | 'sahasrara3d'
+  | 'folk-rosette'
+  | 'folk-tulip'
+  | 'folk-paisley'
+  | 'folk-daisy'
+  | 'folk-masterpiece';
 
 export interface BreathPattern {
   id: string;
@@ -166,6 +173,20 @@ export const BRUSH_STYLES: BrushStyleSpec[] = [
     depthMultiplier: 1.0,
     scoreBonusMultiplier: 1.0,
   },
+  {
+    id: 'folk-petal',
+    nameKey: 'brush.folkPetal',
+    description: 'Folk Botanical Petal with teardrop contour and breath-reactive curvature',
+    depthMultiplier: 1.3,
+    scoreBonusMultiplier: 1.25,
+  },
+  {
+    id: 'paisley-swirl',
+    nameKey: 'brush.paisleySwirl',
+    description: 'Royal Paisley & Goblet Ribbon with angle-sensitive flourish and gold trim',
+    depthMultiplier: 1.35,
+    scoreBonusMultiplier: 1.25,
+  },
 ];
 
 export const BREATH_PATTERNS: BreathPattern[] = [
@@ -236,6 +257,15 @@ export const BREATH_PATTERNS: BreathPattern[] = [
 ];
 
 export const COLOR_PALETTES: ColorPalette[] = [
+  {
+    id: 'folk-terracotta-jewel',
+    nameKey: 'palette.folkTerracotta.name',
+    chakraName: 'Muladhara · Anahata Folk Fusion',
+    spiritualStateKey: 'palette.folkTerracotta.state',
+    requiredStageId: 1,
+    colors: ['#D35933', '#F4B341', '#45A59E', '#226888', '#13384D', '#FDF2D6'],
+    glowColor: 'rgba(211, 89, 51, 0.48)',
+  },
   {
     id: 'saffron-bindu',
     nameKey: 'palette.saffronBindu.name',
@@ -498,6 +528,91 @@ export const SACRED_STAGES: SacredStage[] = [
     spiritualTeachingKey: 'stage.10.teaching',
     geometryPrincipleKey: 'stage.10.geometry',
     unlockedPaletteId: 'nirvana-rainbow',
+  },
+  {
+    id: 11,
+    slug: 'folk-rosette',
+    nameKey: 'stage.11.name',
+    sanskritName: 'Padma Bindu · Central Rosette',
+    archetype: 'folk-rosette',
+    symmetryFold: 8,
+    mirrorSymmetry: true,
+    guideRings: [0.12, 0.18, 0.25],
+    petalsPerRing: 8,
+    targetStrokes: 6,
+    minResonanceToUnlock: 0,
+    difficultyMultiplier: 1.1,
+    spiritualTeachingKey: 'stage.11.teaching',
+    geometryPrincipleKey: 'stage.11.geometry',
+    unlockedPaletteId: 'folk-terracotta-jewel',
+  },
+  {
+    id: 12,
+    slug: 'folk-tulip',
+    nameKey: 'stage.12.name',
+    sanskritName: 'Kalashesha · Royal Tulip Arches',
+    archetype: 'folk-tulip',
+    symmetryFold: 8,
+    mirrorSymmetry: true,
+    guideRings: [0.26, 0.38, 0.46],
+    petalsPerRing: 8,
+    targetStrokes: 8,
+    minResonanceToUnlock: 60,
+    difficultyMultiplier: 1.3,
+    spiritualTeachingKey: 'stage.12.teaching',
+    geometryPrincipleKey: 'stage.12.geometry',
+    unlockedPaletteId: 'folk-terracotta-jewel',
+  },
+  {
+    id: 13,
+    slug: 'folk-paisley',
+    nameKey: 'stage.13.name',
+    sanskritName: 'Kalka & Bija · Paisley Whispers',
+    archetype: 'folk-paisley',
+    symmetryFold: 8,
+    mirrorSymmetry: true,
+    guideRings: [0.46, 0.56, 0.66, 0.72],
+    petalsPerRing: 8,
+    targetStrokes: 10,
+    minResonanceToUnlock: 130,
+    difficultyMultiplier: 1.5,
+    spiritualTeachingKey: 'stage.13.teaching',
+    geometryPrincipleKey: 'stage.13.geometry',
+    unlockedPaletteId: 'folk-terracotta-jewel',
+  },
+  {
+    id: 14,
+    slug: 'folk-daisy',
+    nameKey: 'stage.14.name',
+    sanskritName: 'Suryamukhi · Marigold Daisy Crown',
+    archetype: 'folk-daisy',
+    symmetryFold: 8,
+    mirrorSymmetry: true,
+    guideRings: [0.72, 0.81, 0.89],
+    petalsPerRing: 8,
+    targetStrokes: 12,
+    minResonanceToUnlock: 220,
+    difficultyMultiplier: 1.75,
+    spiritualTeachingKey: 'stage.14.teaching',
+    geometryPrincipleKey: 'stage.14.geometry',
+    unlockedPaletteId: 'folk-terracotta-jewel',
+  },
+  {
+    id: 15,
+    slug: 'folk-masterpiece',
+    nameKey: 'stage.15.name',
+    sanskritName: 'Maha Rajasthani · Royal Folk Masterpiece',
+    archetype: 'folk-masterpiece',
+    symmetryFold: 8,
+    mirrorSymmetry: true,
+    guideRings: [0.18, 0.38, 0.56, 0.72, 0.86, 0.94],
+    petalsPerRing: 8,
+    targetStrokes: 16,
+    minResonanceToUnlock: 350,
+    difficultyMultiplier: 2.2,
+    spiritualTeachingKey: 'stage.15.teaching',
+    geometryPrincipleKey: 'stage.15.geometry',
+    unlockedPaletteId: 'folk-terracotta-jewel',
   },
 ];
 
